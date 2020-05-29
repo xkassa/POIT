@@ -1,0 +1,2 @@
+# POIT
+Zaverecne_Zadanie_Predmetu_POIT_Ladislav_Kassa
