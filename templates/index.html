@@ -10,7 +10,107 @@
      $(document).ready(function() {
          
           
+          var gaugeax = new RadialGauge({
+          renderTo: 'canvasgaugeax',
+          width: 300,
+          height: 300,
+          units: "Degrees",
+          minValue: -60,
+          maxValue: 60,
+          majorTicks: [
+              
+              "-60",
+              "-50",
+              "-40",
+              "-30",
+              "-20",
+              "-10",
+              "0",
+              "10",
+              "20",
+              "30",
+              "40",
+              "50",
+              "60"
+          ],
+          minorTicks: 2,
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": -60,
+                  "to": -50,
+                  "color": "rgba(200, 50, 50, .75)"
+              },
+              {
+                  "from": 50,
+                  "to": 60,
+                  "color": "rgba(200, 50, 50, .75)"
+              }
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 1500,
+          animationRule: "linear"
+      });
+      gaugeax.draw();
+      gaugeax.value="0";
           
+    var gaugeay = new RadialGauge({
+          renderTo: 'canvasgaugeay',
+          width: 300,
+          height: 300,
+          units: "Degrees",
+          minValue: -60,
+          maxValue: 60,
+          majorTicks: [
+              
+              "-60",
+              "-50",
+              "-40",
+              "-30",
+              "-20",
+              "-10",
+              "0",
+              "10",
+              "20",
+              "30",
+              "40",
+              "50",
+              "60"
+          ],
+          minorTicks: 2,
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": -60,
+                  "to": -50,
+                  "color": "rgba(200, 50, 50, .75)"
+              },
+              {
+                  "from": 50,
+                  "to": 60,
+                  "color": "rgba(200, 50, 50, .75)"
+              }
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 1500,
+          animationRule: "linear"
+      });
+      gaugeay.draw();
+      gaugeay.value="0";
           
     var gaugedist = new RadialGauge({
           renderTo: 'canvasgaugedist',
@@ -113,7 +213,7 @@
         tmp7=tmp8;
         tmp8=tmp9;
         tmp9=tmp10;
-        tmp10='Received #'+(msg.count/20)+', Distance: '+(40-msg.dist)+'<br>';
+        tmp10='Received #'+(msg.count/20)+', Ax: '+msg.anglex+', Ay: '+msg.angley+', Distance: '+(40-msg.dist)+'<br>';
         $('#log1').html(tmp1);
         $('#log2').html(tmp2);
         $('#log3').html(tmp3);
@@ -124,7 +224,46 @@
         $('#log8').html(tmp8);
         $('#log9').html(tmp9);
         $('#log10').html(tmp10);
+        if (msg.count/20 < 75) {
+            xmin=0;
+            }
+        else {
+            xmin=msg.count/20-75;
+            }
+        xmax=msg.count/20;
+        x.push(parseFloat(msg.count/20));
+        ax.push(parseFloat(msg.anglex));
+        ay.push(parseFloat(msg.angley));
+        traceax = {
+            x: x,
+            y: ax,
+            name:"Ax",
+        };
+        traceay = {
+            x: x,
+            y: ay,
+            name:"Ay",
+        };
+        layout = {
+            title: 'Data',
+            xaxis: {
+              title: 'x',
+              range: [xmin,xmax],
+            },
+            yaxis: {
+              title: 'y',
+              range: [ymin,ymax],
+          }
+        };
         
+        
+        console.log(traceax,traceay);
+        var traces = new Array();
+        traces.push(traceax,traceay);
+        Plotly.newPlot($('#plotdiv')[0], traces, layout); 
+        //addTraces
+        gaugeax.value = msg.anglex;
+        gaugeay.value = msg.angley;
         gaugedist.value = msg.dist;
         dist=40-msg.dist;
         if (dist==40)
@@ -148,16 +287,18 @@
             document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar4.png";
             }
         
+        document.getElementById("mainturn").style="transform:rotate("+(Math.round(msg.angley/10)*10)+"deg);";
+        document.getElementById("sideturn").style="transform:rotate("+(Math.round(msg.anglex/10)*10)+"deg);";
         
         });
 
-      $('form#emit').submit(function(event) {
-          socket.emit('my_event', {value: $('#emit_value').val()});
-          return false; });
-          
       
+      
+          
+     
       $('#disconnect').click(function(event) {
           socket.emit('disconnect_request');
+          location.href = 'http://www.dzonatan.szm.com/podakovanie.jpg';
           return false; });         
       });
     </script>
@@ -183,18 +324,26 @@
      
     
     <td align="center">
-             </td>
-     <td align="center">
-         </td>
-    <td align="center">
+         <button id="buttonRun" type="submit" value="start" style="padding: 0; border: none; background: none;"><img id="running" src="http://www.dzonatan.szm.com/connect.png" width="300"></button>
      </td>
+     <td align="center">
+         <button id="buttonVal" type="submit" value="start" style="padding: 0; border: none; background: none;"><img id="record" src="http://www.dzonatan.szm.com/recordstop.png" width="380" height="110"></button>
+    </td>
+    <td align="center">
+  <button id="disconnect" type="submit" style="padding: 0; border: none; background: none;"><img src="http://www.dzonatan.szm.com/theend.png" width="300"></button>
+    </td>
  </tr>
  <tr>
      <td align="center">
-    </td>
+         
+         <h2 align="center">Naklon bocny</h2>
+         <canvas id="canvasgaugeax"></canvas>
+     </td>
      
      <td align="center">
-           </td>
+         <h2 align="center">Naklon hlavny</h2>
+         <canvas id="canvasgaugeay"></canvas>
+     </td>
      <td align="center">
          <h2 align="center">ParkAsistant</h2>
          <canvas id="canvasgaugedist"></canvas>
@@ -202,15 +351,19 @@
  </tr>
  <tr>
      <td align="center">
-         </td>
+         <img id="sideturn" src="http://www.dzonatan.szm.com/carfront.svg" height="310" width="310">
+     </td>
      <td align="center"> 
-          </td>
+         <img id="mainturn" src="http://www.dzonatan.szm.com/carside.svg" height="390" width="390">
+     </td>
          
      <td align="center">
-          </td>
+         <img id="walldist" height="310" align="center">
+     </td>
  <tr>
      <td colspan="3" align="center">
-           </td>
+         <div id="plotdiv" style="width:900px;height:300px;"></div>
+     </td>
  </tr>
  <tr height="300">
      <td colspan="3" align="center">
@@ -227,16 +380,7 @@
           <div id="log10"></div>
      </td>
  </tr>
- <tr>
-     <td align="center">
-      </td>
-     <td align="center">
-      </td>
-      
-     <td>
-     </td>
-     
- </tr>
+ 
  
 </tbody></table>
 
