@@ -2,20 +2,14 @@ import RPi.GPIO as GPIO
 import time
 import pygame
 import os
+
 pygame.init()
 j = pygame.joystick.Joystick(0)
 j.init()
 print('Initialized Joystick : %s' % j.get_name())
 
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-
-##GPIO_TRIGGER = 24
-##GPIO_ECHO = 21
-##
-##GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
-##GPIO.setup(GPIO_ECHO, GPIO.IN)
 
 GPIO.setup(17,GPIO.OUT)
 s=GPIO.PWM(17,50)
@@ -36,7 +30,6 @@ GPIO.output(22, GPIO.HIGH)
 GPIO.output(27, GPIO.HIGH)
 
 anglediff=0
-enginerunsel=False
 enginerunstart=False
 S1=7+anglediff
 MF=0
@@ -47,20 +40,13 @@ Treshold=0.2
 TresholdS=0.05
 dist=50
 
-
 def setcar():
     s.ChangeDutyCycle(S1)
-
     mf.ChangeDutyCycle(MF)
     mr.ChangeDutyCycle(MR)
     
-
-
-
-
 try:   
-    while True:
-        
+    while True:      
         events = pygame.event.get()
         for event in events:
           UpdateMotors = 0
@@ -69,11 +55,6 @@ try:
                     print('Client has Disconnected, ending script')
                     GPIO.cleanup()
                     quit()
-                   
-                    
-                elif event.button==8:
-                    enginerunsel=not enginerunsel
-                    time.sleep(0.3)
                 elif event.button==9:
                     enginerunstart=not enginerunstart
                     time.sleep(0.3)
@@ -88,7 +69,6 @@ try:
                         print(anglediff)
                     time.sleep(0.2)
                 
-          # Check if one of the joysticks has moved
           if event.type == pygame.JOYAXISMOTION:
             if event.axis == 1:
               Rychlost = event.value
@@ -104,9 +84,7 @@ try:
                   if S1>8.5:
                       S1=8.5
                   if S1<5.5:
-                      S1=5.5
-                  
-                    
+                      S1=5.5                
                 else: S1=7+anglediff
                 
                 if (Rychlost < -Treshold):
@@ -116,27 +94,19 @@ try:
                 if (Rychlost > Treshold):
                   MR=Rychlost*50
                 else:
-                  MR=0
-                  
-                
+                  MR=0             
                 if (MR>0 and MF>0):
                     MR=0
-                    MF=0
-                
-                if (enginerunsel and enginerunstart):
-                    setcar()
-                    
-                    
+                    MF=0              
+                if (enginerunstart):
+                    setcar()               
                 else:
-                    print(enginerunsel)
-                    print(enginerunstart)
+                    print('MotorVypnuty')
                     MR=0
                     MF=0
                     S1=7+anglediff
-                    setcar()
+                    setcar()      
+    time.sleep(0.05)
         
-    time.sleep(0.2)
-        
-
 except KeyboardInterrupt:
     GPIO.cleanup()

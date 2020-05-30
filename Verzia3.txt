@@ -1,0 +1,14 @@
+Verzia3
+app.py
+	Pridany zapis do databazy a do textoveho suboru
+	Po stlaceni end script sa pekne ukonci aplikacia a uz to nerobi problemy
+	Su tu pridane aj nove cesty na webstranke napriklad vypis celej databazy
+drive.py
+	Start motorov som spravil len na jedno tlacidlo lebo s dvoma to bolo otravne uz
+	Vymazal som nejake veci co tam ostali este zo stareho kodu, ked sa v drive.py merala aj vzdialenost(teraz je merana len v app.py)
+	Cyklus hlavneho Loopu som skratil na 0.05s lebo uz to malo mega pomale reakcie
+	Tento drive.py si myslim ze je nateraz dobry do buducna uz zrejme len male upravy, moyno default poohu serva by som trocha upravil lebo je otravne to furt nastavovat aby islo auto rovno
+config.cfg
+	Pridany subor, v ktorom je heslo a meno pouzivatela nic som tam viacmenej nemenil len som to skopiroval z cviceni v buducnosti mozno zmenim to heslo a skusim nieco vymysliet aby nebol len tak lahko dostupny lebo sa mi to nezda moc bezpecne kebyze to chcem nechat bezat na verejnom serveri uz
+Celkovo
+	Uz to zacina fungovat dobre v dalsej verzii idem pridat asi vypis z databazy a zo suboru do grafu, to by malo byt ale v samostatnych tamplateoch

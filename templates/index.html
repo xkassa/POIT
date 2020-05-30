@@ -291,11 +291,7 @@
         document.getElementById("sideturn").style="transform:rotate("+(Math.round(msg.anglex/10)*10)+"deg);";
         
         });
-
-      
-      
-          
-     
+            
       $('#disconnect').click(function(event) {
           socket.emit('disconnect_request');
           location.href = 'http://www.dzonatan.szm.com/podakovanie.jpg';
