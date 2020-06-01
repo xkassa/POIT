@@ -291,7 +291,38 @@
         document.getElementById("sideturn").style="transform:rotate("+(Math.round(msg.anglex/10)*10)+"deg);";
         
         });
-            
+
+      $('form#emit').submit(function(event) {
+          socket.emit('my_event', {value: $('#emit_value').val()});
+          return false; });
+      $('#buttonVal').click(function(event) {
+          socket.emit('db_event', {value: $('#buttonVal').val()});
+          if ($(this).val() == "start") {
+            $(this).val("stop");
+            document.getElementById("record").src="http://www.dzonatan.szm.com/recording.gif";
+          }
+          else {
+            $(this).val("start");
+            document.getElementById("record").src="http://www.dzonatan.szm.com/recordstop.png";
+          }
+          return false; });
+          
+      $('#buttonRun').click(function(event) {
+          socket.emit('start_event', {value: $('#buttonRun').val()});
+          if ($(this).val() == "start") {
+            $(this).val("stop");
+            document.getElementById("running").src="http://www.dzonatan.szm.com/disconnect.png";
+          }
+          else {
+            $(this).val("start");
+            document.getElementById("running").src="http://www.dzonatan.szm.com/connect.png";
+          }
+          return false; }); 
+          
+      $('#sliderVal').change(function(event) {
+          console.log($('#sliderVal').val());
+          socket.emit('slider_event', {value: $('#sliderVal').val()});
+          return false; });
       $('#disconnect').click(function(event) {
           socket.emit('disconnect_request');
           location.href = 'http://www.dzonatan.szm.com/podakovanie.jpg';
@@ -376,7 +407,18 @@
           <div id="log10"></div>
      </td>
  </tr>
- 
+ <tr>
+     <td align="center">
+     <a href="graph">Vypis do grafu z databazy</a> 
+     </td>
+     <td align="center">
+     <a href="graphtxt">Vypis do grafu z dokumentu</a> 
+     </td>
+      
+     <td>
+     </td>
+     
+ </tr>
  
 </tbody></table>
 

@@ -84,6 +84,13 @@ def MPU_9265_getdata():
     zout = zout / 16384.0
     return gxout,gyout,gzout,xout,yout,zout
 
+def write2file(Ax,Ay,dist,n):
+    fo = open("static/files/test.txt","a+")    
+    val = '[{"y": 0.6551787400492523, "x": 1, "t": 1522016547.531831}, {"y": 0.47491473008127605, "x": 2, "t": 1522016549.534749}, {"y": 0.7495528524284468, "x": 3, "t": 1522016551.537547}, {"y": 0.19625207463282368, "x": 4, "t": 1522016553.540447}, {"y": 0.3741884249440639, "x": 5, "t": 1522016555.543216}, {"y": 0.06684808042190538, "x": 6, "t": 1522016557.546104}, {"y": 0.17399442194131343, "x": 7, "t": 1522016559.54899}, {"y": 0.025055174467733865, "x": 8, "t": 1522016561.551384}]'
+    fo.write("%s\r\n" %val)
+    return "done"
+
+
 
 async_mode = None
 app = Flask(__name__)
@@ -171,6 +178,9 @@ def disconnect_request():
     print('Client has Disconnected, ending script')
     os._exit(0)
     
+@app.route('/graph', methods=['GET', 'POST'])
+def graph():
+    return render_template('graph.html', async_mode=socketio.async_mode)
 
 @app.route('/db')
 def db():
@@ -189,7 +199,9 @@ def dbdata(num):
   rv = cursor.fetchone()
   return str(rv[0])
 
-
+@app.route('/graphtxt', methods=['GET', 'POST'])
+def graphtxt():
+    return render_template('graphtxt.html', async_mode=socketio.async_mode)
 
 @app.route('/read/<string:num>')
 def readmyfile(num):
