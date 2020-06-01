@@ -3,11 +3,39 @@ import time
 import pygame
 import os
 
-pygame.init()
-j = pygame.joystick.Joystick(0)
-j.init()
-print('Initialized Joystick : %s' % j.get_name())
+startf=open("run.txt","w")
+startf.write("aaaa")
+startf.close()
+time.sleep(0.5)
+print('StartDrive.py')
 
+def stop():
+    stopf= open("run.txt", "w")
+    stopf.write("stop")
+    stopf.close()
+
+def stoptest():
+    stopf= open("run.txt", "r")
+    stopt=(stopf.read(4))
+    stopf.close()
+    if stopt=="stop":
+        istop=1;
+    else:
+        istop=0
+        
+    return istop
+
+pygame.init()
+testPS3=pygame.joystick.get_count()
+print(testPS3)
+if testPS3==1:
+    j = pygame.joystick.Joystick(0)
+    j.init()
+    print('Initialized Joystick : %s' % j.get_name())
+else:
+    print('PS3 controller nieje pripojeny, koncim script')
+    stop()
+    os._exit(0)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -39,6 +67,7 @@ Rychlost=0
 Treshold=0.2
 TresholdS=0.05
 dist=50
+counter=0
 
 def setcar():
     s.ChangeDutyCycle(S1)
@@ -53,6 +82,7 @@ try:
           if event.type==pygame.JOYBUTTONDOWN:
                 if event.button==10:
                     print('Client has Disconnected, ending script')
+                    stop()
                     GPIO.cleanup()
                     quit()
                 elif event.button==9:
@@ -106,7 +136,14 @@ try:
                     MF=0
                     S1=7+anglediff
                     setcar()      
-    time.sleep(0.05)
+        time.sleep(0.05)
+        counter=counter+1
+        if counter==20:
+            counter=0
+            if stoptest():
+                print('App.py called to stop')
+                GPIO.cleanup()
+                quit()
         
 except KeyboardInterrupt:
     GPIO.cleanup()

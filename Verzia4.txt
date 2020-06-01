@@ -1,4 +1,0 @@
-Verzia4
-app.py
-	Vypis do do grafu z databazy a z textaku, pridane nato dva nove templates
-	

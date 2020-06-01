@@ -10,6 +10,27 @@ import RPi.GPIO as GPIO
 import MySQLdb 
 import ConfigParser
 
+startf=open("run.txt","w")
+startf.write("aaaa")
+startf.close()
+time.sleep(0.5)
+print('StartApp.py')
+
+def stop():
+    stopf= open("run.txt", "w")
+    stopf.write("stop")
+    stopf.close()
+
+def stoptest():
+    stopf= open("run.txt", "r")
+    stopt=(stopf.read(4))
+    stopf.close()
+    if stopt=="stop":
+        istop=1;
+    else:
+        istop=0
+    return istop
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -84,14 +105,6 @@ def MPU_9265_getdata():
     zout = zout / 16384.0
     return gxout,gyout,gzout,xout,yout,zout
 
-def write2file(Ax,Ay,dist,n):
-    fo = open("static/files/test.txt","a+")    
-    val = '[{"y": 0.6551787400492523, "x": 1, "t": 1522016547.531831}, {"y": 0.47491473008127605, "x": 2, "t": 1522016549.534749}, {"y": 0.7495528524284468, "x": 3, "t": 1522016551.537547}, {"y": 0.19625207463282368, "x": 4, "t": 1522016553.540447}, {"y": 0.3741884249440639, "x": 5, "t": 1522016555.543216}, {"y": 0.06684808042190538, "x": 6, "t": 1522016557.546104}, {"y": 0.17399442194131343, "x": 7, "t": 1522016559.54899}, {"y": 0.025055174467733865, "x": 8, "t": 1522016561.551384}]'
-    fo.write("%s\r\n" %val)
-    return "done"
-
-
-
 async_mode = None
 app = Flask(__name__)
 
@@ -125,6 +138,9 @@ def background_thread(args):
     ## put ka in range 0 to 1 better near 0
     ka=0.2
     while True:
+        if stoptest():
+            print('Drive.py called to stop')
+            os._exit(0)
         socketio.sleep(dtime)
         if runvariable=="start":
             gx,gy,gz,ax,ay,az=MPU_9265_getdata()
@@ -176,11 +192,23 @@ def graphlive():
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
     print('Client has Disconnected, ending script')
+    stop()
     os._exit(0)
     
 @app.route('/graph', methods=['GET', 'POST'])
 def graph():
     return render_template('graph.html', async_mode=socketio.async_mode)
+
+@app.route('/dbdata/<string:num>', methods=['GET', 'POST'])
+def dbdata(num):
+  num = int(num)
+  numstr1 = str(int((num + 1)/10))
+  numstr2 = str((num + 1) - int((num + 1)/10)*10)
+  db = MySQLdb.connect(host=myhost,user=myuser,passwd=mypasswd,db=mydb)
+  cursor = db.cursor()
+  cursor.execute("SELECT hodnoty FROM graph WHERE id=%s%s" % (numstr1, numstr2))
+  rv = cursor.fetchone()
+  return str(rv[0])
 
 @app.route('/db')
 def db():
@@ -189,15 +217,6 @@ def db():
   cursor.execute('''SELECT  hodnoty FROM  graph WHERE id=1''')
   rv = cursor.fetchall()
   return str(rv)    
-
-@app.route('/dbdata/<string:num>', methods=['GET', 'POST'])
-def dbdata(num):
-  db = MySQLdb.connect(host=myhost,user=myuser,passwd=mypasswd,db=mydb)
-  cursor = db.cursor()
-  print num
-  cursor.execute("SELECT hodnoty FROM  graph WHERE id=%s", num)
-  rv = cursor.fetchone()
-  return str(rv[0])
 
 @app.route('/graphtxt', methods=['GET', 'POST'])
 def graphtxt():

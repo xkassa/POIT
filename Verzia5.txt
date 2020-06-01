@@ -1,0 +1,14 @@
+Verzia5
+app.py
+	Z databazy sa daju cykreslovat udaje az do riadku 99
+app.py a drive.py medzi sebou komunikuju cez run.txt, ak sa jedna z nich vypne , tak aj druha sa vypne nasledne
+
+LKPOIT.sh
+	nova bash file, ktora spusta naraz app.py aj drive.py, co je pre pouzivatela ziadane mat pustene tieto appky naraz
+drive.py
+	kontrola ze ci je pripojeny ps3 controller, ak nie tak koniec skriptu a tympadom aj koniec skriptu app.py cez vzajomnu konunikaciu
+nedostatok- app.py sa nevypne spolu s drive.py ak este nebol klient pripojeny na server
+
+templates-
+	v index pridane copyright a buttony maju krajsi text aj farbu vo vsetkych troch template ale len tie spodne
+	
