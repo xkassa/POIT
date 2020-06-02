@@ -9,20 +9,21 @@ import os
 import RPi.GPIO as GPIO
 import MySQLdb 
 import ConfigParser
+import subprocess
 
-startf=open("run.txt","w")
+startf=open("static/files/run.txt","w")
 startf.write("aaaa")
 startf.close()
 time.sleep(0.5)
 print('StartApp.py')
 
 def stop():
-    stopf= open("run.txt", "w")
+    stopf= open("static/files/run.txt", "w")
     stopf.write("stop")
     stopf.close()
 
 def stoptest():
-    stopf= open("run.txt", "r")
+    stopf= open("static/files/run.txt", "r")
     stopt=(stopf.read(4))
     stopf.close()
     if stopt=="stop":
@@ -193,6 +194,7 @@ def graphlive():
 def disconnect_request():
     print('Client has Disconnected, ending script')
     stop()
+    time.sleep(0.5)
     os._exit(0)
     
 @app.route('/graph', methods=['GET', 'POST'])
@@ -201,12 +203,22 @@ def graph():
 
 @app.route('/dbdata/<string:num>', methods=['GET', 'POST'])
 def dbdata(num):
-  num = int(num)
-  numstr1 = str(int((num + 1)/10))
-  numstr2 = str((num + 1) - int((num + 1)/10)*10)
   db = MySQLdb.connect(host=myhost,user=myuser,passwd=mypasswd,db=mydb)
   cursor = db.cursor()
-  cursor.execute("SELECT hodnoty FROM graph WHERE id=%s%s" % (numstr1, numstr2))
+  if num=="last":
+      cursor.execute("SELECT hodnoty FROM graph WHERE id=(SELECT MAX(id) FROM graph)")  
+  else:
+      cursor.execute("SELECT MAX(id) FROM graph")
+      maxdb=cursor.fetchone()
+      num = int(num)
+      if num>(maxdb[0]-1):
+          cursor.execute("SELECT hodnoty FROM graph WHERE id=(SELECT MAX(id) FROM graph)")
+          print('Maximalny riadok databazy je:')
+          print(maxdb[0]-1)
+      else:
+          numstr1 = str(int((num + 1)/10))
+          numstr2 = str((num + 1) - int((num + 1)/10)*10)
+          cursor.execute("SELECT hodnoty FROM graph WHERE id=%s%s" % (numstr1, numstr2))
   rv = cursor.fetchone()
   return str(rv[0])
 
@@ -214,9 +226,17 @@ def dbdata(num):
 def db():
   db = MySQLdb.connect(host=myhost,user=myuser,passwd=mypasswd,db=mydb)
   cursor = db.cursor()
-  cursor.execute('''SELECT  hodnoty FROM  graph WHERE id=1''')
+  cursor.execute('SELECT  hodnoty FROM  graph WHERE id=(SELECT MAX(id) FROM graph)')
   rv = cursor.fetchall()
-  return str(rv)    
+  return str(rv)
+
+@app.route('/text')
+def text():
+  fo = open("static/files/test.txt","r")
+  rows = fo.readlines()
+  fo.close()
+  line = len(rows)
+  return rows[line-1]
 
 @app.route('/graphtxt', methods=['GET', 'POST'])
 def graphtxt():
@@ -227,7 +247,14 @@ def readmyfile(num):
     fo = open("static/files/test.txt","r")
     rows = fo.readlines()
     fo.close()
-    return rows[int(num)-1]
+    line = len(rows)
+    if (num=="last") or (int(num)>line):
+        tmpfile=line
+        print('Maximalny riadok je:')
+        print(line)
+    else:
+        tmpfile=int(num)
+    return rows[tmpfile-1]
 
 @socketio.on('connect', namespace='/test')
 def test_connect():

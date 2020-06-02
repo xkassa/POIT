@@ -3,19 +3,19 @@ import time
 import pygame
 import os
 
-startf=open("run.txt","w")
+time.sleep(8)
+startf=open("static/files/run.txt","w")
 startf.write("aaaa")
 startf.close()
-time.sleep(0.5)
 print('StartDrive.py')
 
 def stop():
-    stopf= open("run.txt", "w")
+    stopf= open("static/files/run.txt", "w")
     stopf.write("stop")
     stopf.close()
 
 def stoptest():
-    stopf= open("run.txt", "r")
+    stopf= open("static/files/run.txt", "r")
     stopt=(stopf.read(4))
     stopf.close()
     if stopt=="stop":
@@ -87,6 +87,8 @@ try:
                     quit()
                 elif event.button==9:
                     enginerunstart=not enginerunstart
+                    if enginerunstart:
+                        print("Motor zapnuty")
                     time.sleep(0.3)
                 elif event.button==5:
                     if anglediff<0.5:
@@ -131,7 +133,8 @@ try:
                 if (enginerunstart):
                     setcar()               
                 else:
-                    print('MotorVypnuty')
+                    if counter==19:
+                        print('Motor vypnuty')
                     MR=0
                     MF=0
                     S1=7+anglediff
