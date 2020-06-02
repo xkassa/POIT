@@ -1,5 +1,0 @@
-Verzia6
-Doladene chyby v komunikácii medzi app.py a drive.py
-Vypis do grafu: ked zadate vacsie cislo ako je riadkov subore/databaze tak nepadne cely program ale je to osetrene a vykresli to posledny
-dostupny riadoka a zaroven upozorni v konzole ze neieje mozne taka riadok vypisat a vzpise poradie posledneho riadku. Z textaku a databazy vymazane 
-zle data, ktore pekne nevyzerali po vykresleni

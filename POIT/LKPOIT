@@ -1,8 +1,0 @@
-#!/bin/bash
-
-#run ps3rccar driving script and server srcipt simultaenously
-
-sudo python drive.py &
-sudo python app.py
-
-# etc.
