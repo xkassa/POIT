@@ -1,0 +1,431 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title>RC car</title>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+   <script src="static/libs/plotly-latest.min.js"></script>
+    <script src="static/libs/gauge.min.js"></script>
+   <script type="text/javascript" charset="utf-8">
+     $(document).ready(function() {
+         
+          
+          var gaugeax = new RadialGauge({
+          renderTo: 'canvasgaugeax',
+          width: 300,
+          height: 300,
+          units: "Degrees",
+          minValue: -60,
+          maxValue: 60,
+          majorTicks: [
+              
+              "-60",
+              "-50",
+              "-40",
+              "-30",
+              "-20",
+              "-10",
+              "0",
+              "10",
+              "20",
+              "30",
+              "40",
+              "50",
+              "60"
+          ],
+          minorTicks: 2,
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": -60,
+                  "to": -50,
+                  "color": "rgba(200, 50, 50, .75)"
+              },
+              {
+                  "from": 50,
+                  "to": 60,
+                  "color": "rgba(200, 50, 50, .75)"
+              }
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 1500,
+          animationRule: "linear"
+      });
+      gaugeax.draw();
+      gaugeax.value="0";
+          
+    var gaugeay = new RadialGauge({
+          renderTo: 'canvasgaugeay',
+          width: 300,
+          height: 300,
+          units: "Degrees",
+          minValue: -60,
+          maxValue: 60,
+          majorTicks: [
+              
+              "-60",
+              "-50",
+              "-40",
+              "-30",
+              "-20",
+              "-10",
+              "0",
+              "10",
+              "20",
+              "30",
+              "40",
+              "50",
+              "60"
+          ],
+          minorTicks: 2,
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": -60,
+                  "to": -50,
+                  "color": "rgba(200, 50, 50, .75)"
+              },
+              {
+                  "from": 50,
+                  "to": 60,
+                  "color": "rgba(200, 50, 50, .75)"
+              }
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 1500,
+          animationRule: "linear"
+      });
+      gaugeay.draw();
+      gaugeay.value="0";
+          
+    var gaugedist = new RadialGauge({
+          renderTo: 'canvasgaugedist',
+          width: 300,
+          height: 300,
+          units: "cm",
+          minValue: 0,
+          maxValue: 40,
+        
+          majorTicks: [
+              "40",
+              "30",
+              "20",
+              "10",
+              "0"
+          ],
+          strokeTicks: true,
+          highlights: [
+              {
+                  "from": 30,
+                  "to": 40,
+                  "color": "rgba(200, 50, 50, .75)"
+              },
+              {
+                  "from": 20,
+                  "to": 30,
+                  "color": "rgba(255, 126, 0, .75)"
+              },
+              {
+                  "from": 10,
+                  "to": 20,
+                  "color": "rgba(255, 255, 50, .75)"
+              },
+              {
+                  "from": 0,
+                  "to": 10,
+                  "color": "rgba(50, 200, 50, .75)"
+              }
+              
+          ],
+          colorPlate: "#fff",
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: "arrow",
+          needleWidth: 2,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          animationDuration: 1500,
+          animationRule: "linear"
+      });
+      gaugedist.draw();
+      gaugedist.value="0";
+      var dist=40; 
+      var x = new Array();
+      var ax = new Array();
+      var ay = new Array();
+      var az = new Array();
+      var gx = new Array();
+      var gy = new Array();
+      var gz = new Array();
+      var traceax;
+      var traceay;
+      var traceaz;
+      var tracegx;
+      var tracegy;
+      var tracegz;
+      var layout;   
+        var xmin=0;
+          var xmax=0;
+          var ymin=-65;
+          var ymax=65;
+          var tmp1="";
+          var tmp2="";
+          var tmp3="";
+          var tmp4="";
+          var tmp5="";
+          var tmp6="";
+          var tmp7="";
+          var tmp8="";
+          var tmp9="";
+          var tmp10="";
+      namespace = '/test';
+      var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+      socket.on('connect', function() {
+        socket.emit('my_event', {data: 'I\'m connected!', value: 1}); });
+
+      socket.on('my_response', function(msg) {
+       
+        console.log(msg.data);
+      
+        
+        tmp1=tmp2;
+        tmp2=tmp3;
+        tmp3=tmp4;
+        tmp4=tmp5;
+        tmp5=tmp6;
+        tmp6=tmp7;
+        tmp7=tmp8;
+        tmp8=tmp9;
+        tmp9=tmp10;
+        tmp10='Received #'+(msg.count/20)+', Ax: '+msg.anglex+', Ay: '+msg.angley+', Distance: '+(40-msg.dist)+'<br>';
+        $('#log1').html(tmp1);
+        $('#log2').html(tmp2);
+        $('#log3').html(tmp3);
+        $('#log4').html(tmp4);
+        $('#log5').html(tmp5);
+        $('#log6').html(tmp6);
+        $('#log7').html(tmp7);
+        $('#log8').html(tmp8);
+        $('#log9').html(tmp9);
+        $('#log10').html(tmp10);
+        if (msg.count/20 < 75) {
+            xmin=0;
+            }
+        else {
+            xmin=msg.count/20-75;
+            }
+        xmax=msg.count/20;
+        x.push(parseFloat(msg.count/20));
+        ax.push(parseFloat(msg.anglex));
+        ay.push(parseFloat(msg.angley));
+        traceax = {
+            x: x,
+            y: ax,
+            name:"Naklon Bocny",
+        };
+        traceay = {
+            x: x,
+            y: ay,
+            name:"Naklon hlavny",
+        };
+        layout = {
+            title: 'Priebeh naklonu vozidla',
+            xaxis: {
+              title: 'poradie vzorky',
+              range: [xmin,xmax],
+            },
+            yaxis: {
+              title: 'Uhol (Degree)',
+              range: [ymin,ymax],
+          }
+        };
+        
+        
+        console.log(traceax,traceay);
+        var traces = new Array();
+        traces.push(traceax,traceay);
+        Plotly.newPlot($('#plotdiv')[0], traces, layout); 
+        //addTraces
+        gaugeax.value = msg.anglex;
+        gaugeay.value = msg.angley;
+        gaugedist.value = msg.dist;
+        dist=40-msg.dist;
+        if (dist==40)
+        {
+           document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar.png";
+            }
+        else if (dist>30)
+        {
+            document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar1.png";
+            }
+        else if (dist>20)
+        {
+            document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar2.png";
+            }
+        else if (dist>10)
+       {
+            document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar3.png";
+            }
+        else
+        {
+            document.getElementById("walldist").src="http://www.dzonatan.szm.com/topcar4.png";
+            }
+        
+        document.getElementById("mainturn").style="transform:rotate("+(Math.round(msg.angley/10)*10)+"deg);";
+        document.getElementById("sideturn").style="transform:rotate("+(Math.round(msg.anglex/10)*10)+"deg);";
+        
+        });
+
+      $('form#emit').submit(function(event) {
+          socket.emit('my_event', {value: $('#emit_value').val()});
+          return false; });
+      $('#buttonVal').click(function(event) {
+          socket.emit('db_event', {value: $('#buttonVal').val()});
+          if ($(this).val() == "start") {
+            $(this).val("stop");
+            document.getElementById("record").src="http://www.dzonatan.szm.com/recording.gif";
+          }
+          else {
+            $(this).val("start");
+            document.getElementById("record").src="http://www.dzonatan.szm.com/recordstop.png";
+          }
+          return false; });
+          
+      $('#buttonRun').click(function(event) {
+          socket.emit('start_event', {value: $('#buttonRun').val()});
+          if ($(this).val() == "start") {
+            $(this).val("stop");
+            document.getElementById("running").src="http://www.dzonatan.szm.com/disconnect.png";
+          }
+          else {
+            $(this).val("start");
+            document.getElementById("running").src="http://www.dzonatan.szm.com/connect.png";
+          }
+          return false; }); 
+          
+      $('#sliderVal').change(function(event) {
+          console.log($('#sliderVal').val());
+          socket.emit('slider_event', {value: $('#sliderVal').val()});
+          return false; });
+      $('#disconnect').click(function(event) {
+          socket.emit('disconnect_request');
+          location.href = 'http://www.dzonatan.szm.com/podakovanie.jpg';
+          return false; });         
+      });
+    </script>
+    <style>
+    body {
+        background-position:center;
+        background-attachment:fixed;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        }
+    
+</style>
+ </head>
+ <body style="background-image:url('http://www.dzonatan.szm.com/pozadie.jpg')">
+ 
+ <table width="900" bgcolor="white" align="center" border="1"><tbody>
+ <tr>
+     <td colspan="3" align="center">
+         <img src="http://www.dzonatan.szm.com/logouamt.png">
+     </td>
+ </tr>
+ <tr>
+     
+    
+    <td align="center">
+         <button id="buttonRun" type="submit" value="start" style="padding: 0; border: none; background: none;"><img id="running" src="http://www.dzonatan.szm.com/connect.png" width="300"></button>
+     </td>
+     <td align="center">
+         <button id="buttonVal" type="submit" value="start" style="padding: 0; border: none; background: none;"><img id="record" src="http://www.dzonatan.szm.com/recordstop.png" width="380" height="110"></button>
+    </td>
+    <td align="center">
+  <button id="disconnect" type="submit" style="padding: 0; border: none; background: none;"><img src="http://www.dzonatan.szm.com/theend.png" width="300"></button>
+    </td>
+ </tr>
+ <tr>
+     <td align="center">
+         
+         <h2 align="center">Naklon bocny</h2>
+         <canvas id="canvasgaugeax"></canvas>
+     </td>
+     
+     <td align="center">
+         <h2 align="center">Naklon hlavny</h2>
+         <canvas id="canvasgaugeay"></canvas>
+     </td>
+     <td align="center">
+         <h2 align="center">ParkAsistant</h2>
+         <canvas id="canvasgaugedist"></canvas>
+     </td>
+ </tr>
+ <tr>
+     <td align="center">
+         <img id="sideturn" src="http://www.dzonatan.szm.com/carfront.svg" height="310" width="310">
+     </td>
+     <td align="center"> 
+         <img id="mainturn" src="http://www.dzonatan.szm.com/carside.svg" height="390" width="390">
+     </td>
+         
+     <td align="center">
+         <img id="walldist" height="310" align="center">
+     </td>
+ <tr>
+     <td colspan="3" align="center">
+         <div id="plotdiv" style="width:900px;height:300px;"></div>
+     </td>
+ </tr>
+ <tr height="300">
+     <td colspan="3" align="center">
+          <h2>Receive:</h2>
+          <div id="log1"></div>
+          <div id="log2"></div>
+          <div id="log3"></div>
+          <div id="log4"></div>
+          <div id="log5"></div>
+          <div id="log6"></div>
+          <div id="log7"></div>
+          <div id="log8"></div>
+          <div id="log9"></div>
+          <div id="log10"></div>
+     </td>
+ </tr>
+ <tr>
+     <td align="center">
+     <a href="graph"><font size="5" face="Comic Sans MS" color="darkblue">
+Vypis do grafu z databazy</font></a> 
+     </td>
+     <td align="center">
+     <a href="graphtxt"><font size="5" face="Comic Sans MS" color="darkblue">
+Vypis do grafu z dokumentu</font></a> 
+     </td>
+      
+     <td align="center">
+     <font size="5" face="Comic Sans MS" color="darkblue">
+        ©2020 Ladislav Kašša </font>
+     </td>
+     
+ </tr>
+ 
+</tbody></table>
+
+ </body>
+</html>
+
