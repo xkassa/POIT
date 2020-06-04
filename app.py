@@ -18,7 +18,7 @@ if startt=="aaaa":
     time.sleep(0.5)
     print('StartApp.py, drive.py je uz spusteny')
 else:
-    startf=open("static/files/run.txt","r")
+    startf=open("static/files/run.txt","w")
     startf.write("aaaa")
     startf.close()
     time.sleep(0.5)
