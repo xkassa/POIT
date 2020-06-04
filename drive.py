@@ -3,7 +3,8 @@ import time
 import pygame
 import os
 
-time.sleep(8)
+
+time.sleep(0.5)
 startf=open("static/files/run.txt","w")
 startf.write("aaaa")
 startf.close()
@@ -32,6 +33,7 @@ if testPS3==1:
     j = pygame.joystick.Joystick(0)
     j.init()
     print('Initialized Joystick : %s' % j.get_name())
+    print('Motor vypnuty')
 else:
     print('PS3 controller nieje pripojeny, koncim script')
     stop()
@@ -39,9 +41,10 @@ else:
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-GPIO.setup(17,GPIO.OUT)
-s=GPIO.PWM(17,50)
+GPIO.setup(12,GPIO.OUT)
+s=GPIO.PWM(12,50)
 s.start(7)
+
 
 GPIO.setup(18,GPIO.OUT)
 mf=GPIO.PWM(18,100)
@@ -51,11 +54,6 @@ GPIO.setup(23,GPIO.OUT)
 mr=GPIO.PWM(23,100)
 mr.start(0)
 
-GPIO.setup(22,GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(27,GPIO.OUT, initial=GPIO.LOW)
-
-GPIO.output(22, GPIO.HIGH)
-GPIO.output(27, GPIO.HIGH)
 
 anglediff=0
 enginerunstart=False
@@ -68,7 +66,7 @@ Treshold=0.2
 TresholdS=0.05
 dist=50
 counter=0
-
+dtime=0.1
 def setcar():
     s.ChangeDutyCycle(S1)
     mf.ChangeDutyCycle(MF)
@@ -80,24 +78,26 @@ try:
         for event in events:
           UpdateMotors = 0
           if event.type==pygame.JOYBUTTONDOWN:
-                if event.button==10:
+                if event.button==16:
                     print('Client has Disconnected, ending script')
                     stop()
                     GPIO.cleanup()
                     quit()
-                elif event.button==9:
+                elif event.button==3:
                     enginerunstart=not enginerunstart
                     if enginerunstart:
                         print("Motor zapnuty")
+                    else:
+                        print("Motor vypnuty")
                     time.sleep(0.3)
-                elif event.button==5:
+                elif event.button==11:
                     if anglediff<0.5:
-                        anglediff=anglediff+0.1
+                        anglediff=round((anglediff+0.1),2)
                         print(anglediff)
                     time.sleep(0.2)
-                elif event.button==4:
+                elif event.button==10:
                     if anglediff>-0.5:
-                        anglediff=anglediff-0.1
+                        anglediff=round((anglediff-0.1),2)
                         print(anglediff)
                     time.sleep(0.2)
                 
@@ -105,7 +105,7 @@ try:
             if event.axis == 1:
               Rychlost = event.value
               UpdateMotors = 1
-            elif event.axis == 3:
+            elif event.axis == 2:
               Uhol = event.value
               UpdateMotors = 1
               
@@ -120,11 +120,11 @@ try:
                 else: S1=7+anglediff
                 
                 if (Rychlost < -Treshold):
-                  MF=-Rychlost*90
+                  MF=-Rychlost*50
                 else: MF=0
                 
                 if (Rychlost > Treshold):
-                  MR=Rychlost*50
+                  MR=Rychlost*30
                 else:
                   MR=0             
                 if (MR>0 and MF>0):
@@ -133,13 +133,11 @@ try:
                 if (enginerunstart):
                     setcar()               
                 else:
-                    if counter==19:
-                        print('Motor vypnuty')
                     MR=0
                     MF=0
                     S1=7+anglediff
                     setcar()      
-        time.sleep(0.05)
+        time.sleep(dtime)
         counter=counter+1
         if counter==20:
             counter=0

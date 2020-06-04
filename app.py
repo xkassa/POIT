@@ -138,7 +138,7 @@ def background_thread(args):
     uholy=0
     count=0
     countemit=0
-    dtime=0.01
+    dtime=0.02
     dist=50
     dist1=50
     dist2=50
@@ -152,8 +152,8 @@ def background_thread(args):
         socketio.sleep(dtime)
         if runvariable=="start":
             gx,gy,gz,ax,ay,az=MPU_9265_getdata()
-            uholx=ka*(uholx+gy*dtime)+(1-ka)*(math.atan(ay/(math.sqrt(ax*ax+az*az)))*180/math.pi)-5.4
-            uholy=-ka*(uholy+gx*dtime)-(1-ka)*(math.atan(ax/(math.sqrt(ay*ay+az*az)))*180/math.pi)-14.5
+            uholx=ka*(uholx+gy*dtime)+(1-ka)*(math.atan(ay/(math.sqrt(ax*ax+az*az)))*180/math.pi)-7
+            uholy=-ka*(uholy+gx*dtime)-(1-ka)*(math.atan(ax/(math.sqrt(ay*ay+az*az)))*180/math.pi)-27.5
             count += 1
             countemit +=1
             if (countemit == 20):
