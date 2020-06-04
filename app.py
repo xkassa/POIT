@@ -11,11 +11,18 @@ import MySQLdb
 import ConfigParser
 import subprocess
 
-startf=open("static/files/run.txt","w")
-startf.write("aaaa")
+startf=open("static/files/run.txt","r")
+startt=(startf.read(4))
 startf.close()
-time.sleep(0.5)
-print('StartApp.py')
+if startt=="aaaa":
+    time.sleep(0.5)
+    print('StartApp.py, drive.py je uz spusteny')
+else:
+    startf=open("static/files/run.txt","r")
+    startf.write("aaaa")
+    startf.close()
+    time.sleep(0.5)
+    print('StartApp.py')
 
 def stop():
     stopf= open("static/files/run.txt", "w")
@@ -146,7 +153,7 @@ def background_thread(args):
         if runvariable=="start":
             gx,gy,gz,ax,ay,az=MPU_9265_getdata()
             uholx=ka*(uholx+gy*dtime)+(1-ka)*(math.atan(ay/(math.sqrt(ax*ax+az*az)))*180/math.pi)-5.4
-            uholy=-ka*(uholy+gx*dtime)-(1-ka)*(math.atan(ax/(math.sqrt(ay*ay+az*az)))*180/math.pi)-21.5
+            uholy=-ka*(uholy+gx*dtime)-(1-ka)*(math.atan(ax/(math.sqrt(ay*ay+az*az)))*180/math.pi)-14.5
             count += 1
             countemit +=1
             if (countemit == 20):
